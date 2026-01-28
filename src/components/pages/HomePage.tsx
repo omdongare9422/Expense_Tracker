@@ -79,7 +79,7 @@ export default function HomePage() {
       <section className="relative w-full min-h-screen flex flex-col justify-center items-center pt-20 overflow-hidden">
         <div className="absolute inset-0 z-0">
            <Image 
-             src="https://static.wixstatic.com/media/12d367_71ebdd7141d041e4be3d91d80d4578dd~mv2.png?id=1" 
+             src="https://static.wixstatic.com/media/0e4ba9_c7408475fe9344ada956a9a703d0f7a3~mv2.png?originWidth=1152&originHeight=576" 
              alt="Quantum Background" 
              className="w-full h-full object-cover opacity-10 mix-blend-screen"
            />
@@ -262,7 +262,7 @@ export default function HomePage() {
       <section className="relative w-full h-[80vh] overflow-hidden flex items-center justify-center">
         <div className="absolute inset-0">
           <Image 
-            src="https://static.wixstatic.com/media/12d367_71ebdd7141d041e4be3d91d80d4578dd~mv2.png?id=2" 
+            src="https://static.wixstatic.com/media/0e4ba9_e2b7b8452fdd401e9211f3aa534f5905~mv2.png?originWidth=1920&originHeight=1280" 
             alt="Abstract Data Flow" 
             className="w-full h-full object-cover opacity-40 grayscale hover:grayscale-0 transition-all duration-1000 scale-105 hover:scale-100"
           />
