@@ -1,4 +1,17 @@
-import { items } from "@wix/data";
+export interface WixDataItem {
+     _id?: string;
+     _createdDate?: Date | string;
+     _updatedDate?: Date | string;
+     [key: string]: any;
+}
 
-export type WixDataItem = items.WixDataItem;
-export type WixDataQueryResult = items.WixDataResult;
+export interface WixDataQueryResult {
+     items: WixDataItem[];
+     totalCount: number;
+     hasNext: () => boolean;
+     hasPrev: () => boolean;
+     length: number;
+     pageSize: number;
+     currentPage: number;
+     totalPages: number;
+}

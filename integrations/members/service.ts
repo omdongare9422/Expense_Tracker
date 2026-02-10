@@ -1,15 +1,10 @@
-import { members } from "@wix/members";
 import { Member } from ".";
+import { storageService } from "@/services/storage";
 
 export const getCurrentMember = async (): Promise<Member | null> => {
-  try {
-    const member = await members.getCurrentMember({ fieldsets: ["FULL"] });
-    if (!member) {
-      console.log('==== No member found');
-    }
-    return member.member;
-  } catch (error) {
-    console.log(error);
-    return null;
-  }
+  // Simulate network delay
+  await new Promise(resolve => setTimeout(resolve, 500));
+
+  // Return mock user from storage
+  return storageService.getUser() as unknown as Member;
 };

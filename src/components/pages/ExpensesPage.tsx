@@ -2,8 +2,7 @@ import { useState, useEffect } from 'react';
 import { useMember } from '@/integrations';
 import { BaseCrudService } from '@/integrations';
 import { Expenses } from '@/entities';
-import { motion } from 'framer-motion';
-import { Plus, Trash2, Edit, DollarSign, Calendar, Tag, CreditCard, FileText } from 'lucide-react';
+import { Plus, Trash2, Edit, DollarSign, Calendar, Tag, CreditCard, Filter } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
@@ -68,7 +67,7 @@ export default function ExpensesPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     const expenseData = {
       _id: editingExpense?._id || crypto.randomUUID(),
       title: formData.title,
@@ -104,6 +103,8 @@ export default function ExpensesPage() {
   };
 
   const handleDelete = async (id: string) => {
+    if (!confirm('Are you sure you want to delete this expense?')) return;
+
     // Optimistic delete
     setExpenses(expenses.filter(exp => exp._id !== id));
     try {
@@ -142,107 +143,49 @@ export default function ExpensesPage() {
   const totalSpent = expenses.reduce((sum, expense) => sum + (expense.amount || 0), 0);
 
   return (
-    <div className="min-h-screen bg-background text-foreground">
+    <div className="min-h-screen bg-background text-foreground flex flex-col">
       <Header />
 
-      <div className="max-w-[100rem] mx-auto px-6 py-12">
-        {/* Header Section */}
-        <div className="mb-12">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-          >
-            <h1 className="font-heading text-5xl md:text-6xl mb-4 bg-gradient-to-r from-accent-teal to-accent-magenta bg-clip-text text-transparent">
-              Expense Dashboard
-            </h1>
-            <p className="font-paragraph text-lg text-muted-foreground">
-              Track and manage your expenses with precision
+      <main className="flex-1 container mx-auto px-6 py-8">
+        {/* Header & Actions */}
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
+          <div>
+            <h1 className="font-heading text-3xl font-bold tracking-tight">Expenses</h1>
+            <p className="text-muted-foreground mt-1">
+              Manage your spending and track your budget.
             </p>
-          </motion.div>
-        </div>
+          </div>
 
-        {/* Stats Section */}
-        <div className="grid md:grid-cols-3 gap-6 mb-12">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.1 }}
-            className="bg-background/70 backdrop-blur-xl rounded-2xl border border-accent-teal/20 p-6 shadow-[0_8px_32px_0_rgba(0,0,0,0.3)]"
-          >
-            <div className="flex items-center justify-between mb-2">
-              <span className="font-paragraph text-sm text-muted-foreground">Total Spent</span>
-              <DollarSign className="w-5 h-5 text-accent-teal" />
-            </div>
-            <p className="font-heading text-3xl text-accent-teal">${totalSpent.toFixed(2)}</p>
-          </motion.div>
-
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.2 }}
-            className="bg-background/70 backdrop-blur-xl rounded-2xl border border-accent-magenta/20 p-6 shadow-[0_8px_32px_0_rgba(0,0,0,0.3)]"
-          >
-            <div className="flex items-center justify-between mb-2">
-              <span className="font-paragraph text-sm text-muted-foreground">Total Expenses</span>
-              <FileText className="w-5 h-5 text-accent-magenta" />
-            </div>
-            <p className="font-heading text-3xl text-accent-magenta">{expenses.length}</p>
-          </motion.div>
-
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.3 }}
-            className="bg-background/70 backdrop-blur-xl rounded-2xl border border-accent-teal/20 p-6 shadow-[0_8px_32px_0_rgba(0,0,0,0.3)]"
-          >
-            <div className="flex items-center justify-between mb-2">
-              <span className="font-paragraph text-sm text-muted-foreground">Average Expense</span>
-              <Tag className="w-5 h-5 text-foreground" />
-            </div>
-            <p className="font-heading text-3xl text-foreground">
-              ${expenses.length > 0 ? (totalSpent / expenses.length).toFixed(2) : '0.00'}
-            </p>
-          </motion.div>
-        </div>
-
-        {/* Add Expense Button */}
-        <div className="mb-8">
           <Dialog open={isDialogOpen} onOpenChange={(open) => {
             setIsDialogOpen(open);
             if (!open) resetForm();
           }}>
             <DialogTrigger asChild>
-              <Button className="bg-gradient-to-r from-accent-teal to-accent-magenta text-primary-foreground font-heading px-6 py-3 rounded-lg hover:opacity-90 transition-all">
-                <Plus className="w-5 h-5 mr-2" />
+              <Button size="lg" className="shadow-sm">
+                <Plus className="w-4 h-4 mr-2" />
                 Add Expense
               </Button>
             </DialogTrigger>
-            <DialogContent className="bg-background border border-accent-teal/20 max-w-2xl">
+            <DialogContent className="max-w-2xl">
               <DialogHeader>
-                <DialogTitle className="font-heading text-2xl text-foreground">
+                <DialogTitle>
                   {editingExpense ? 'Edit Expense' : 'Add New Expense'}
                 </DialogTitle>
               </DialogHeader>
-              <form onSubmit={handleSubmit} className="space-y-6">
+              <form onSubmit={handleSubmit} className="space-y-6 mt-4">
                 <div className="grid md:grid-cols-2 gap-4">
-                  <div>
-                    <Label htmlFor="title" className="font-paragraph text-sm text-muted-foreground mb-2 block">
-                      Title *
-                    </Label>
+                  <div className="space-y-2">
+                    <Label htmlFor="title">Title *</Label>
                     <Input
                       id="title"
                       required
                       value={formData.title}
                       onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                      className="bg-background/50 border-accent-teal/20 text-foreground font-paragraph"
                       placeholder="e.g., Grocery Shopping"
                     />
                   </div>
-                  <div>
-                    <Label htmlFor="amount" className="font-paragraph text-sm text-muted-foreground mb-2 block">
-                      Amount *
-                    </Label>
+                  <div className="space-y-2">
+                    <Label htmlFor="amount">Amount *</Label>
                     <Input
                       id="amount"
                       type="number"
@@ -250,56 +193,48 @@ export default function ExpensesPage() {
                       required
                       value={formData.amount}
                       onChange={(e) => setFormData({ ...formData, amount: e.target.value })}
-                      className="bg-background/50 border-accent-teal/20 text-foreground font-paragraph"
                       placeholder="0.00"
                     />
                   </div>
                 </div>
 
                 <div className="grid md:grid-cols-2 gap-4">
-                  <div>
-                    <Label htmlFor="category" className="font-paragraph text-sm text-muted-foreground mb-2 block">
-                      Category *
-                    </Label>
+                  <div className="space-y-2">
+                    <Label htmlFor="category">Category *</Label>
                     <Select value={formData.category} onValueChange={(value) => setFormData({ ...formData, category: value })}>
-                      <SelectTrigger className="bg-background/50 border-accent-teal/20 text-foreground font-paragraph">
+                      <SelectTrigger>
                         <SelectValue placeholder="Select category" />
                       </SelectTrigger>
-                      <SelectContent className="bg-background border-accent-teal/20">
+                      <SelectContent>
                         {categories.map((cat) => (
-                          <SelectItem key={cat} value={cat} className="font-paragraph text-foreground">
+                          <SelectItem key={cat} value={cat}>
                             {cat}
                           </SelectItem>
                         ))}
                       </SelectContent>
                     </Select>
                   </div>
-                  <div>
-                    <Label htmlFor="date" className="font-paragraph text-sm text-muted-foreground mb-2 block">
-                      Date *
-                    </Label>
+                  <div className="space-y-2">
+                    <Label htmlFor="date">Date *</Label>
                     <Input
                       id="date"
                       type="date"
                       required
                       value={formData.date}
                       onChange={(e) => setFormData({ ...formData, date: e.target.value })}
-                      className="bg-background/50 border-accent-teal/20 text-foreground font-paragraph"
                     />
                   </div>
                 </div>
 
-                <div>
-                  <Label htmlFor="paymentMethod" className="font-paragraph text-sm text-muted-foreground mb-2 block">
-                    Payment Method
-                  </Label>
+                <div className="space-y-2">
+                  <Label htmlFor="paymentMethod">Payment Method</Label>
                   <Select value={formData.paymentMethod} onValueChange={(value) => setFormData({ ...formData, paymentMethod: value })}>
-                    <SelectTrigger className="bg-background/50 border-accent-teal/20 text-foreground font-paragraph">
+                    <SelectTrigger>
                       <SelectValue placeholder="Select payment method" />
                     </SelectTrigger>
-                    <SelectContent className="bg-background border-accent-teal/20">
+                    <SelectContent>
                       {paymentMethods.map((method) => (
-                        <SelectItem key={method} value={method} className="font-paragraph text-foreground">
+                        <SelectItem key={method} value={method}>
                           {method}
                         </SelectItem>
                       ))}
@@ -307,26 +242,18 @@ export default function ExpensesPage() {
                   </Select>
                 </div>
 
-                <div>
-                  <Label htmlFor="description" className="font-paragraph text-sm text-muted-foreground mb-2 block">
-                    Description
-                  </Label>
+                <div className="space-y-2">
+                  <Label htmlFor="description">Description (Optional)</Label>
                   <Textarea
                     id="description"
                     value={formData.description}
                     onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                    className="bg-background/50 border-accent-teal/20 text-foreground font-paragraph min-h-[100px]"
+                    className="min-h-[100px]"
                     placeholder="Add any additional details..."
                   />
                 </div>
 
-                <div className="flex gap-4">
-                  <Button
-                    type="submit"
-                    className="flex-1 bg-gradient-to-r from-accent-teal to-accent-magenta text-primary-foreground font-heading rounded-lg hover:opacity-90 transition-all"
-                  >
-                    {editingExpense ? 'Update Expense' : 'Add Expense'}
-                  </Button>
+                <div className="flex justify-end gap-3 pt-4">
                   <Button
                     type="button"
                     variant="outline"
@@ -334,9 +261,11 @@ export default function ExpensesPage() {
                       setIsDialogOpen(false);
                       resetForm();
                     }}
-                    className="border-accent-magenta text-accent-magenta font-heading rounded-lg hover:bg-accent-magenta/10 transition-all"
                   >
                     Cancel
+                  </Button>
+                  <Button type="submit">
+                    {editingExpense ? 'Save Changes' : 'Create Expense'}
                   </Button>
                 </div>
               </form>
@@ -344,105 +273,135 @@ export default function ExpensesPage() {
           </Dialog>
         </div>
 
-        {/* Expenses Table */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.6, delay: 0.4 }}
-          className="bg-background/70 backdrop-blur-xl rounded-2xl border border-accent-teal/20 shadow-[0_8px_32px_0_rgba(0,0,0,0.3)] overflow-hidden"
-          style={{ minHeight: '400px' }}
-        >
+        {/* Stats Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+          <Card
+            title="Total Spent"
+            value={`$${totalSpent.toFixed(2)}`}
+            icon={DollarSign}
+            trend="+2.5% from last month"
+          />
+          <Card
+            title="Total Transactions"
+            value={expenses.length.toString()}
+            icon={CreditCard}
+            trend="+4 this week"
+          />
+          <Card
+            title="Average Transaction"
+            value={`$${expenses.length > 0 ? (totalSpent / expenses.length).toFixed(2) : '0.00'}`}
+            icon={Tag}
+          />
+        </div>
+
+        {/* Expenses List */}
+        <div className="border border-border rounded-lg bg-card text-card-foreground shadow-sm overflow-hidden">
+          <div className="p-6 border-b border-border flex items-center justify-between">
+            <h2 className="font-semibold text-lg">Recent Transactions</h2>
+            <Button variant="outline" size="sm" className="h-8 gap-2">
+              <Filter className="w-3.5 h-3.5" />
+              Filter
+            </Button>
+          </div>
+
           {isLoading ? (
             <div className="flex items-center justify-center py-20">
               <LoadingSpinner />
             </div>
           ) : expenses.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-20">
-              <DollarSign className="w-16 h-16 text-muted mb-4" />
-              <p className="font-heading text-xl text-muted-foreground mb-2">No expenses yet</p>
-              <p className="font-paragraph text-sm text-muted-foreground">Add your first expense to get started</p>
+            <div className="flex flex-col items-center justify-center py-20 text-center">
+              <div className="w-12 h-12 rounded-full bg-muted flex items-center justify-center mb-4">
+                <DollarSign className="w-6 h-6 text-muted-foreground" />
+              </div>
+              <h3 className="font-medium text-lg mb-1">No expenses found</h3>
+              <p className="text-muted-foreground max-w-sm">
+                Get started by adding your first expense transaction.
+              </p>
             </div>
           ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead>
-                  <tr className="border-b border-accent-teal/20">
-                    <th className="text-left p-4 font-heading text-sm text-muted-foreground">Title</th>
-                    <th className="text-left p-4 font-heading text-sm text-muted-foreground">Amount</th>
-                    <th className="text-left p-4 font-heading text-sm text-muted-foreground">Category</th>
-                    <th className="text-left p-4 font-heading text-sm text-muted-foreground">Date</th>
-                    <th className="text-left p-4 font-heading text-sm text-muted-foreground">Payment</th>
-                    <th className="text-right p-4 font-heading text-sm text-muted-foreground">Actions</th>
+            <div className="relative w-full overflow-auto">
+              <table className="w-full text-sm text-left">
+                <thead className="bg-muted/50 text-muted-foreground font-medium">
+                  <tr>
+                    <th className="h-10 px-4 py-3 min-w-[150px]">Title</th>
+                    <th className="h-10 px-4 py-3">Category</th>
+                    <th className="h-10 px-4 py-3">Date</th>
+                    <th className="h-10 px-4 py-3 text-right">Amount</th>
+                    <th className="h-10 px-4 py-3 text-right">Actions</th>
                   </tr>
                 </thead>
-                <tbody>
-                  {expenses.map((expense, index) => (
-                    <motion.tr
+                <tbody className="divide-y divide-border">
+                  {expenses.map((expense) => (
+                    <tr
                       key={expense._id}
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ duration: 0.3, delay: index * 0.05 }}
-                      className="border-b border-accent-teal/10 hover:bg-accent-teal/5 transition-colors"
+                      className="hover:bg-muted/50 transition-colors"
                     >
-                      <td className="p-4">
-                        <div>
-                          <p className="font-paragraph text-sm text-foreground">{expense.title}</p>
-                          {expense.description && (
-                            <p className="font-paragraph text-xs text-muted-foreground mt-1 line-clamp-1">
-                              {expense.description}
-                            </p>
-                          )}
-                        </div>
+                      <td className="p-4 align-middle">
+                        <div className="font-medium text-foreground">{expense.title}</div>
+                        {expense.paymentMethod && (
+                          <div className="text-xs text-muted-foreground mt-0.5">{expense.paymentMethod}</div>
+                        )}
                       </td>
-                      <td className="p-4">
-                        <span className="font-heading text-sm text-accent-teal">
-                          ${expense.amount?.toFixed(2)}
-                        </span>
-                      </td>
-                      <td className="p-4">
-                        <span className="inline-flex items-center gap-1 px-3 py-1 bg-accent-magenta/10 border border-accent-magenta/20 rounded-lg font-paragraph text-xs text-accent-magenta">
-                          <Tag className="w-3 h-3" />
+                      <td className="p-4 align-middle">
+                        <span className="inline-flex items-center rounded-full border border-border px-2.5 py-0.5 text-xs bg-secondary text-secondary-foreground font-medium">
                           {expense.category}
                         </span>
                       </td>
-                      <td className="p-4">
-                        <span className="font-paragraph text-sm text-muted-foreground flex items-center gap-1">
-                          <Calendar className="w-4 h-4" />
-                          {expense.date ? format(new Date(expense.date), 'MMM dd, yyyy') : 'N/A'}
-                        </span>
+                      <td className="p-4 align-middle text-muted-foreground">
+                        {expense.date ? format(new Date(expense.date), 'MMM dd, yyyy') : 'N/A'}
                       </td>
-                      <td className="p-4">
-                        <span className="font-paragraph text-sm text-muted-foreground flex items-center gap-1">
-                          <CreditCard className="w-4 h-4" />
-                          {expense.paymentMethod || 'N/A'}
-                        </span>
+                      <td className="p-4 align-middle text-right font-medium">
+                        ${expense.amount?.toFixed(2)}
                       </td>
-                      <td className="p-4">
+                      <td className="p-4 align-middle text-right">
                         <div className="flex items-center justify-end gap-2">
-                          <button
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-8 w-8 text-muted-foreground hover:text-foreground"
                             onClick={() => handleEdit(expense)}
-                            className="p-2 hover:bg-accent-teal/10 rounded-lg transition-colors"
                           >
-                            <Edit className="w-4 h-4 text-accent-teal" />
-                          </button>
-                          <button
+                            <Edit className="w-4 h-4" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-8 w-8 text-muted-foreground hover:text-destructive transition-colors"
                             onClick={() => handleDelete(expense._id)}
-                            className="p-2 hover:bg-destructive/10 rounded-lg transition-colors"
                           >
-                            <Trash2 className="w-4 h-4 text-destructive" />
-                          </button>
+                            <Trash2 className="w-4 h-4" />
+                          </Button>
                         </div>
                       </td>
-                    </motion.tr>
+                    </tr>
                   ))}
                 </tbody>
               </table>
             </div>
           )}
-        </motion.div>
-      </div>
+        </div>
+      </main>
 
       <Footer />
+    </div>
+  );
+}
+
+function Card({ title, value, icon: Icon, trend }: { title: string, value: string, icon: any, trend?: string }) {
+  return (
+    <div className="rounded-lg border border-border bg-card text-card-foreground shadow-sm p-6">
+      <div className="flex items-center justify-between space-y-0 pb-2">
+        <h3 className="tracking-tight text-sm font-medium text-muted-foreground">{title}</h3>
+        <Icon className="h-4 w-4 text-muted-foreground" />
+      </div>
+      <div className="flex flex-col">
+        <div className="text-2xl font-bold">{value}</div>
+        {trend && (
+          <p className="text-xs text-muted-foreground mt-1">
+            {trend}
+          </p>
+        )}
+      </div>
     </div>
   );
 }

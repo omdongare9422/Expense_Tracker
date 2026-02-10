@@ -11,16 +11,10 @@ export interface Expenses {
   _id: string;
   _createdDate?: Date;
   _updatedDate?: Date;
-  /** @wixFieldType text */
-  title?: string;
-  /** @wixFieldType number */
-  amount?: number;
-  /** @wixFieldType text */
-  category?: string;
-  /** @wixFieldType date */
-  date?: Date | string;
-  /** @wixFieldType text */
+  title: string;
+  amount: number;
+  category: string;
+  date: string;
   description?: string;
-  /** @wixFieldType text */
-  paymentMethod?: string;
+  paymentMethod: string;
 }

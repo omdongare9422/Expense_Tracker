@@ -1,158 +1,163 @@
 import { useMember } from '@/integrations';
-import { motion } from 'framer-motion';
-import { User, Mail, Calendar, Shield } from 'lucide-react';
+import { User, Mail, Calendar, Shield, Phone } from 'lucide-react';
 import { format } from 'date-fns';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
+import { Button } from '@/components/ui/button';
 import { Image } from '@/components/ui/image';
 
 export default function ProfilePage() {
   const { member } = useMember();
 
   return (
-    <div className="min-h-screen bg-background text-foreground">
+    <div className="min-h-screen bg-background text-foreground flex flex-col">
       <Header />
 
-      <div className="max-w-[100rem] mx-auto px-6 py-12">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-        >
-          <h1 className="font-heading text-5xl md:text-6xl mb-4 bg-gradient-to-r from-accent-teal to-accent-magenta bg-clip-text text-transparent">
-            Profile
-          </h1>
-          <p className="font-paragraph text-lg text-muted-foreground mb-12">
-            Manage your account information
-          </p>
-        </motion.div>
+      <main className="flex-1 container mx-auto px-6 py-12">
+        <div className="max-w-4xl mx-auto">
+          {/* Page Header */}
+          <div className="mb-8">
+            <h1 className="font-heading text-3xl font-bold tracking-tight">Account Settings</h1>
+            <p className="text-muted-foreground mt-1">
+              Manage your personal information and preferences.
+            </p>
+          </div>
 
-        <div className="grid md:grid-cols-3 gap-8">
-          {/* Profile Card */}
-          <motion.div
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.6, delay: 0.1 }}
-            className="md:col-span-1"
-          >
-            <div className="bg-background/70 backdrop-blur-xl rounded-2xl border border-accent-teal/20 p-8 shadow-[0_8px_32px_0_rgba(0,0,0,0.3)] text-center">
-              {member?.profile?.photo?.url ? (
-                <Image src={member.profile.photo.url} alt="Profile" className="w-32 h-32 rounded-full mx-auto mb-4 border-4 border-accent-teal/20" />
-              ) : (
-                <div className="w-32 h-32 rounded-full mx-auto mb-4 bg-gradient-to-br from-accent-teal to-accent-magenta flex items-center justify-center">
-                  <User className="w-16 h-16 text-primary-foreground" />
+          <div className="grid md:grid-cols-12 gap-8">
+            {/* Sidebar / Profile Summary */}
+            <div className="md:col-span-4 space-y-6">
+              <div className="rounded-lg border border-border bg-card text-card-foreground shadow-sm p-6 text-center">
+                <div className="relative w-24 h-24 mx-auto mb-4">
+                  {member?.profile?.photo?.url ? (
+                    <Image
+                      src={member.profile.photo.url}
+                      alt="Profile"
+                      className="w-full h-full rounded-full object-cover border-2 border-border"
+                    />
+                  ) : (
+                    <div className="w-full h-full rounded-full bg-muted flex items-center justify-center">
+                      <User className="w-10 h-10 text-muted-foreground" />
+                    </div>
+                  )}
+                  {/* Status Indicator */}
+                  <div className="absolute bottom-0 right-0 w-6 h-6 bg-background rounded-full flex items-center justify-center">
+                    <div className="w-4 h-4 bg-green-500 rounded-full border-2 border-background"></div>
+                  </div>
                 </div>
-              )}
-              <h2 className="font-heading text-2xl text-foreground mb-2">
-                {member?.profile?.nickname || member?.contact?.firstName || 'User'}
-              </h2>
-              {member?.profile?.title && (
-                <p className="font-paragraph text-sm text-muted-foreground mb-4">
-                  {member.profile.title}
+
+                <h2 className="font-semibold text-xl mb-1">
+                  {member?.profile?.nickname || member?.contact?.firstName || 'User'}
+                </h2>
+                <p className="text-sm text-muted-foreground mb-4">
+                  {member?.profile?.title || 'Member'}
                 </p>
-              )}
-              <div className="inline-flex items-center gap-2 px-4 py-2 bg-accent-teal/10 border border-accent-teal/20 rounded-lg">
-                <Shield className="w-4 h-4 text-accent-teal" />
-                <span className="font-paragraph text-sm text-accent-teal">
-                  {member?.status || 'Active'}
-                </span>
-              </div>
-            </div>
-          </motion.div>
 
-          {/* Details Card */}
-          <motion.div
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.6, delay: 0.2 }}
-            className="md:col-span-2"
-          >
-            <div className="bg-background/70 backdrop-blur-xl rounded-2xl border border-accent-teal/20 p-8 shadow-[0_8px_32px_0_rgba(0,0,0,0.3)]">
-              <h3 className="font-heading text-2xl text-foreground mb-6">Account Information</h3>
-              
-              <div className="space-y-6">
-                {/* Email */}
-                <div className="flex items-start gap-4 p-4 bg-background/50 rounded-lg border border-accent-teal/10">
-                  <div className="w-10 h-10 bg-accent-teal/10 rounded-lg flex items-center justify-center flex-shrink-0">
-                    <Mail className="w-5 h-5 text-accent-teal" />
-                  </div>
-                  <div className="flex-1">
-                    <p className="font-paragraph text-sm text-muted-foreground mb-1">Email Address</p>
-                    <p className="font-paragraph text-base text-foreground">
-                      {member?.loginEmail || 'Not provided'}
-                    </p>
-                    {member?.loginEmailVerified && (
-                      <span className="inline-block mt-2 px-2 py-1 bg-accent-teal/10 border border-accent-teal/20 rounded text-xs font-paragraph text-accent-teal">
-                        Verified
-                      </span>
-                    )}
-                  </div>
+                <div className="flex justify-center">
+                  <span className="inline-flex items-center rounded-full border border-border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2">
+                    {member?.status || 'Active'}
+                  </span>
+                </div>
+              </div>
+
+              {/* Navigation (Mock) */}
+              <nav className="rounded-lg border border-border bg-card text-card-foreground shadow-sm p-2">
+                <Button variant="ghost" className="w-full justify-start font-medium">
+                  <User className="w-4 h-4 mr-2" />
+                  Personal Info
+                </Button>
+                <Button variant="ghost" className="w-full justify-start text-muted-foreground">
+                  <Shield className="w-4 h-4 mr-2" />
+                  Security
+                </Button>
+                {/* Add more mocked nav items as needed */}
+              </nav>
+            </div>
+
+            {/* Main Content / Details */}
+            <div className="md:col-span-8 space-y-6">
+              <div className="rounded-lg border border-border bg-card text-card-foreground shadow-sm">
+                <div className="p-6 border-b border-border">
+                  <h3 className="font-semibold text-lg">Personal Information</h3>
+                  <p className="text-sm text-muted-foreground">Update your photo and personal details here.</p>
                 </div>
 
-                {/* Full Name */}
-                {(member?.contact?.firstName || member?.contact?.lastName) && (
-                  <div className="flex items-start gap-4 p-4 bg-background/50 rounded-lg border border-accent-teal/10">
-                    <div className="w-10 h-10 bg-accent-magenta/10 rounded-lg flex items-center justify-center flex-shrink-0">
-                      <User className="w-5 h-5 text-accent-magenta" />
-                    </div>
-                    <div className="flex-1">
-                      <p className="font-paragraph text-sm text-muted-foreground mb-1">Full Name</p>
-                      <p className="font-paragraph text-base text-foreground">
-                        {[member?.contact?.firstName, member?.contact?.lastName].filter(Boolean).join(' ')}
-                      </p>
+                <div className="p-6 space-y-6">
+                  {/* Email */}
+                  <div className="grid gap-2">
+                    <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+                      Email Address
+                    </label>
+                    <div className="flex items-center gap-3 p-3 rounded-md border border-input bg-transparent">
+                      <Mail className="w-4 h-4 text-muted-foreground" />
+                      <span className="text-sm flex-1">{member?.loginEmail || 'Not provided'}</span>
+                      {member?.loginEmailVerified && (
+                        <span className="text-xs text-green-600 font-medium bg-green-50 px-2 py-0.5 rounded-full dark:bg-green-900/20 dark:text-green-400">
+                          Verified
+                        </span>
+                      )}
                     </div>
                   </div>
-                )}
 
-                {/* Phone */}
-                {member?.contact?.phones && member.contact.phones.length > 0 && (
-                  <div className="flex items-start gap-4 p-4 bg-background/50 rounded-lg border border-accent-teal/10">
-                    <div className="w-10 h-10 bg-accent-teal/10 rounded-lg flex items-center justify-center flex-shrink-0">
-                      <Shield className="w-5 h-5 text-accent-teal" />
-                    </div>
-                    <div className="flex-1">
-                      <p className="font-paragraph text-sm text-muted-foreground mb-1">Phone Number</p>
-                      <p className="font-paragraph text-base text-foreground">
-                        {member.contact.phones[0]}
-                      </p>
+                  {/* Full Name */}
+                  <div className="grid gap-2">
+                    <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+                      Full Name
+                    </label>
+                    <div className="flex items-center gap-3 p-3 rounded-md border border-input bg-transparent">
+                      <User className="w-4 h-4 text-muted-foreground" />
+                      <span className="text-sm flex-1">
+                        {[member?.contact?.firstName, member?.contact?.lastName].filter(Boolean).join(' ') || 'Not provided'}
+                      </span>
                     </div>
                   </div>
-                )}
 
-                {/* Member Since */}
-                {member?._createdDate && (
-                  <div className="flex items-start gap-4 p-4 bg-background/50 rounded-lg border border-accent-teal/10">
-                    <div className="w-10 h-10 bg-accent-magenta/10 rounded-lg flex items-center justify-center flex-shrink-0">
-                      <Calendar className="w-5 h-5 text-accent-magenta" />
-                    </div>
-                    <div className="flex-1">
-                      <p className="font-paragraph text-sm text-muted-foreground mb-1">Member Since</p>
-                      <p className="font-paragraph text-base text-foreground">
-                        {format(new Date(member._createdDate), 'MMMM dd, yyyy')}
-                      </p>
+                  {/* Phone */}
+                  <div className="grid gap-2">
+                    <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+                      Phone Number
+                    </label>
+                    <div className="flex items-center gap-3 p-3 rounded-md border border-input bg-transparent">
+                      <Phone className="w-4 h-4 text-muted-foreground" />
+                      <span className="text-sm flex-1">
+                        {member?.contact?.phones?.[0] || 'Not provided'}
+                      </span>
                     </div>
                   </div>
-                )}
 
-                {/* Last Login */}
-                {member?.lastLoginDate && (
-                  <div className="flex items-start gap-4 p-4 bg-background/50 rounded-lg border border-accent-teal/10">
-                    <div className="w-10 h-10 bg-accent-teal/10 rounded-lg flex items-center justify-center flex-shrink-0">
-                      <Calendar className="w-5 h-5 text-accent-teal" />
+                  <div className="grid md:grid-cols-2 gap-6">
+                    {/* Member Since */}
+                    <div className="grid gap-2">
+                      <label className="text-sm font-medium leading-none">
+                        Member Since
+                      </label>
+                      <div className="flex items-center gap-3 p-3 rounded-md border border-input bg-transparent">
+                        <Calendar className="w-4 h-4 text-muted-foreground" />
+                        <span className="text-sm">
+                          {member?._createdDate ? format(new Date(member._createdDate), 'MMMM dd, yyyy') : 'N/A'}
+                        </span>
+                      </div>
                     </div>
-                    <div className="flex-1">
-                      <p className="font-paragraph text-sm text-muted-foreground mb-1">Last Login</p>
-                      <p className="font-paragraph text-base text-foreground">
-                        {format(new Date(member.lastLoginDate), 'MMMM dd, yyyy HH:mm')}
-                      </p>
+
+                    {/* Last Login */}
+                    <div className="grid gap-2">
+                      <label className="text-sm font-medium leading-none">
+                        Last Login
+                      </label>
+                      <div className="flex items-center gap-3 p-3 rounded-md border border-input bg-transparent">
+                        <Calendar className="w-4 h-4 text-muted-foreground" />
+                        <span className="text-sm">
+                          {member?.lastLoginDate ? format(new Date(member.lastLoginDate), 'MMM dd, yyyy HH:mm') : 'N/A'}
+                        </span>
+                      </div>
                     </div>
                   </div>
-                )}
+
+                </div>
               </div>
             </div>
-          </motion.div>
+          </div>
         </div>
-      </div>
+      </main>
 
       <Footer />
     </div>

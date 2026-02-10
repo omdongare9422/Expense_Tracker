@@ -16,6 +16,12 @@
     "skipLibCheck": true,
     "noUncheckedIndexedAccess": false,
     "exactOptionalPropertyTypes": false,
+    "target": "es2015",
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "esnext"
+    ],
     "paths": {
       "@/*": [
         "src/*"
@@ -24,14 +30,14 @@
         "src/components/*"
       ],
       "@/integrations/*": [
-        "integrations/*",
+        "integrations/*"
       ],
       "@/integrations": [
         "integrations"
       ],
       "@wix/codegen-framework-packages": [
         "integrations"
-      ],
+      ]
     }
   },
   "include": [
